@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const db = process.env.MONGO_CONNECT;
+const db = process.env.REACT_APP_MONGO_CONNECT;
 
 const connectDB = async () => {
   try {
