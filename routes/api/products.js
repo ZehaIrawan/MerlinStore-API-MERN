@@ -55,21 +55,21 @@ router.post(
   },
 );
 
-// @route    GET api/books
-// @desc     Get all books
+// @route    GET api/products
+// @desc     Get all products
 // @access   Private
 router.get('/', adminAuth, async (req, res) => {
   try {
-    const books = await Book.find().sort({ date: -1 });
-    res.json(books);
+    const products = await Product.find().sort({ date: -1 });
+    res.json(products);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
 
-// @route    GET api/books/:id
-// @desc     Get book by ID
+// @route    GET api/products/:id
+// @desc     Get product by ID
 // @access   Private
 router.get('/:id', adminAuth, async (req, res) => {
   try {
