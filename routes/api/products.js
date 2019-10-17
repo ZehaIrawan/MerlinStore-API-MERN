@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const adminAuth = require('../../middleware/adminAuth');
-
+const auth = require('../../middleware/auth')
 const Product = require('../../models/Product');
 const Admin = require('../../models/Admin');
 
@@ -58,7 +58,7 @@ router.post(
 // @route    GET api/products
 // @desc     Get all products
 // @access   Private
-router.get('/', adminAuth, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const products = await Product.find().sort({ date: -1 });
     res.json(products);
