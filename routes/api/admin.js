@@ -1,13 +1,27 @@
 const express = require('express');
 require('dotenv').config();
 const router = express.Router();
-const auth = require('../../middleware/auth');
+const adminAuth = require('../../middleware/adminAuth');
 const jwtSecret = process.env.REACT_APP_jwtSecret;
 const { check, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const Admin = require('../../models/Admin');
+
+
+// @route    GET api/admin
+// @desc     Test route
+// @access   Private
+router.get('/', adminAuth, async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.admin.id).select('-password');
+    res.json(admin);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
 
 
 // @route    POST api/auth

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ProductSchema = new Schema({
   admin: {
     type: Schema.Types.ObjectId,
-    ref: 'admin',
+    ref: 'admins',
   },
   title: {
     type: String,
