@@ -60,7 +60,11 @@ router.post(
 // @access   Public
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find().sort({ date: -1 });
+    const products = await Product.find()
+      .select('-dl')
+      .select('-admin')
+      .sort({ date: -1 });
+
     res.json(products);
   } catch (err) {
     console.error(err.message);
@@ -71,19 +75,21 @@ router.get('/', async (req, res) => {
 // @route    GET api/products/:id
 // @desc     Get product by ID
 // @access   Private
-router.get('/:id', adminAuth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
+      .select('-dl')
+      .select('-admin');
 
-    if (!book) {
-      return res.status(404).json({ msg: 'Book not found' });
+    if (!product) {
+      return res.status(404).json({ msg: 'Product not found' });
     }
 
-    res.json(book);
+    res.json(product);
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Book not found' });
+      return res.status(404).json({ msg: 'Product not found' });
     }
     res.status(500).send('Server Error');
   }
@@ -126,17 +132,17 @@ router.put(
     adminAuth,
     [
       check('title', 'Title is required')
-      .not()
-      .isEmpty(),
-    check('description', 'Description is required')
-      .not()
-      .isEmpty(),
-    check('price', 'Price is required')
-      .not()
-      .isEmpty(),
-    check('img', 'Image is required')
-      .not()
-      .isEmpty(),
+        .not()
+        .isEmpty(),
+      check('description', 'Description is required')
+        .not()
+        .isEmpty(),
+      check('price', 'Price is required')
+        .not()
+        .isEmpty(),
+      check('img', 'Image is required')
+        .not()
+        .isEmpty(),
     ],
   ],
   async (req, res) => {
