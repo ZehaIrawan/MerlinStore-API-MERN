@@ -143,6 +143,9 @@ router.put(
       check('img', 'Image is required')
         .not()
         .isEmpty(),
+      check('dl', 'Download link is required')
+        .not()
+        .isEmpty(),
     ],
   ],
   async (req, res) => {
@@ -156,6 +159,7 @@ router.put(
       description: req.body.description,
       price: req.body.price,
       img: req.body.img,
+      dl: req.body.dl,
     };
 
     try {
