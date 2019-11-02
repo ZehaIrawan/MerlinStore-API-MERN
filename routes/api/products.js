@@ -43,6 +43,7 @@ router.post(
         price: req.body.price,
         img: req.body.img,
         admin: req.admin.id,
+        dl:req.body.dl
       });
 
       const product = await newProduct.save();
