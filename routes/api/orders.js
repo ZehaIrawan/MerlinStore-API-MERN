@@ -18,14 +18,12 @@ router.post('/', auth, async (req, res) => {
   try {
     let data = await Product.findById(req.body.id);
 
-    console.log(data.dl);
-
     const newOrder = new Order({
       title: data.title,
       description: data.description,
       img: data.img,
       user: req.user.id,
-      dl: data.dl
+      dl: data.dl,
     });
 
     const order = await newOrder.save();
@@ -42,8 +40,7 @@ router.post('/', auth, async (req, res) => {
 // @access   Public
 router.get('/', async (req, res) => {
   try {
-    const orders = await Order.find()
-      .sort({ date: -1 });
+    const orders = await Order.find().sort({ date: -1 });
 
     res.json(orders);
   } catch (err) {
