@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const adminAuth = require('../../middleware/adminAuth');
-const auth = require('../../middleware/auth')
 const Product = require('../../models/Product');
 const Admin = require('../../models/Admin');
 
@@ -43,6 +42,8 @@ router.post(
         description: req.body.description,
         price: req.body.price,
         img: req.body.img,
+        admin: req.admin.id,
+        dl:req.body.dl
       });
 
       const product = await newProduct.save();
@@ -60,7 +61,11 @@ router.post(
 // @access   Public
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find().sort({ date: -1 });
+    const products = await Product.find()
+      .select('-dl')
+      .select('-admin')
+      .sort({ date: -1 });
+
     res.json(products);
   } catch (err) {
     console.error(err.message);
@@ -71,55 +76,56 @@ router.get('/', async (req, res) => {
 // @route    GET api/products/:id
 // @desc     Get product by ID
 // @access   Private
-router.get('/:id', adminAuth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
+      .select('-dl')
+      .select('-admin');
 
-    if (!book) {
-      return res.status(404).json({ msg: 'Book not found' });
+    if (!product) {
+      return res.status(404).json({ msg: 'Product not found' });
     }
 
-    res.json(book);
+    res.json(product);
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Book not found' });
+      return res.status(404).json({ msg: 'Product not found' });
     }
     res.status(500).send('Server Error');
   }
 });
 
-// @route    DELETE api/books/:id
-// @desc     Delete a book
+// @route    DELETE api/products/:id
+// @desc     Delete a product
 // @access   Private
 router.delete('/:id', adminAuth, async (req, res) => {
-  console.log(req);
   try {
-    const book = await Book.findById(req.params.id);
+    const product = await Product.findById(req.params.id);
 
-    if (!book) {
-      return res.status(404).json({ msg: 'Book not found' });
+    if (!product) {
+      return res.status(404).json({ msg: 'product not found' });
     }
 
     // Check user
-    if (book.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: 'User not adminAuthorized' });
+    if (product.admin.toString() !== req.admin.id) {
+      return res.status(401).json({ msg: 'Admin is not Authorized' });
     }
 
-    await book.remove();
+    await product.remove();
 
-    res.json({ msg: 'Book removed' });
+    res.json({ msg: 'Product removed' });
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Book not found' });
+      return res.status(404).json({ msg: 'Product not found' });
     }
     res.status(500).send('Server Error');
   }
 });
 
-// @route    PUT api/book/:id
-// @desc     Update book data
+// @route    PUT api/product/:id
+// @desc     Update product data
 // @access   Private
 router.put(
   '/:id',
@@ -129,16 +135,16 @@ router.put(
       check('title', 'Title is required')
         .not()
         .isEmpty(),
-      check('category', 'Category is required')
+      check('description', 'Description is required')
         .not()
         .isEmpty(),
-      check('adminAuthor', 'adminAuthor is required')
+      check('price', 'Price is required')
         .not()
         .isEmpty(),
-      check('totalChapter', 'TotalChapter is required')
+      check('img', 'Image is required')
         .not()
         .isEmpty(),
-      check('currentChapter', 'currentChapter is required')
+      check('dl', 'Download link is required')
         .not()
         .isEmpty(),
     ],
@@ -151,19 +157,18 @@ router.put(
 
     const updatedData = {
       title: req.body.title,
-      category: req.body.category,
-      adminAuthor: req.body.adminAuthor,
-      totalChapter: req.body.totalChapter,
-      currentChapter: req.body.currentChapter,
+      description: req.body.description,
+      price: req.body.price,
+      img: req.body.img,
+      dl: req.body.dl,
     };
 
     try {
-      const book = await Book.findOne({ _id: req.params.id });
+      const product = await Product.findOne({ _id: req.params.id });
 
-      const result = Object.assign(book, updatedData);
+      const result = Object.assign(product, updatedData);
 
-      console.log(book);
-      await Book.findByIdAndUpdate(
+      await Product.findByIdAndUpdate(
         req.params.id,
         { $set: result },
         { new: true },

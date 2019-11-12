@@ -46,6 +46,7 @@ router.post(
         img: req.body.img,
         quantity: req.body.quantity,
         user: req.user.id,
+        id:req.body.id
       });
 
       const cart = await newCart.save();
