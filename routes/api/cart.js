@@ -46,7 +46,7 @@ router.post(
         img: req.body.img,
         quantity: req.body.quantity,
         user: req.user.id,
-        id:req.body.id
+        id: req.body.id,
       });
 
       const cart = await newCart.save();
@@ -64,7 +64,9 @@ router.post(
 // @access   Private
 router.get('/', auth, async (req, res) => {
   try {
-    const cart = await Cart.find().sort({ date: -1 });
+    const cart = await Cart.find({
+      id: req.user.id,
+    }).sort({ date: -1 });
     res.json(cart);
   } catch (err) {
     console.error(err.message);
@@ -97,6 +99,7 @@ router.get('/:id', auth, async (req, res) => {
 // @desc     Delete an item in cart
 // @access   Private
 router.delete('/:id', auth, async (req, res) => {
+  console.log(req.user.id, 'AA');
   try {
     const cart = await Cart.findById(req.params.id);
 
@@ -105,6 +108,7 @@ router.delete('/:id', auth, async (req, res) => {
     }
 
     // Check user
+    console.log(req.user.id, 'AA');
     if (cart.user.toString() !== req.user.id) {
       return res.status(401).json({ msg: 'User not authorized' });
     }
@@ -153,16 +157,15 @@ router.put(
     }
 
     const updatedData = {
-        title: req.body.title,
-        description: req.body.description,
-        price: req.body.price,
-        img: req.body.img,
-        quantity: req.body.quantity,
+      title: req.body.title,
+      description: req.body.description,
+      price: req.body.price,
+      img: req.body.img,
+      quantity: req.body.quantity,
     };
 
     try {
       const cart = await Cart.findOne({ _id: req.params.id });
-
 
       const result = Object.assign(cart, updatedData);
 
