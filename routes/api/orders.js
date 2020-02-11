@@ -37,10 +37,10 @@ router.post('/', auth, async (req, res) => {
 
 // @route    GET api/orders
 // @desc     Get all orders
-// @access   Public
-router.get('/', async (req, res) => {
+// @access   Private
+router.get('/', auth, async (req, res) => {
   try {
-    const orders = await Order.find().sort({ date: -1 });
+    const orders = await Order.find({ id: req.user.id }).sort({ date: -1 });
 
     res.json(orders);
   } catch (err) {
