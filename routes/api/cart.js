@@ -65,7 +65,7 @@ router.post(
 router.get('/', auth, async (req, res) => {
   try {
     const cart = await Cart.find({
-      id: req.user.id,
+      user: req.user.id,
     }).sort({ date: -1 });
     res.json(cart);
   } catch (err) {
