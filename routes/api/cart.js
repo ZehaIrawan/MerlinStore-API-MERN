@@ -99,7 +99,6 @@ router.get('/:id', auth, async (req, res) => {
 // @desc     Delete an item in cart
 // @access   Private
 router.delete('/:id', auth, async (req, res) => {
-  console.log(req.user.id, 'AA');
   try {
     const cart = await Cart.findById(req.params.id);
 
@@ -108,7 +107,6 @@ router.delete('/:id', auth, async (req, res) => {
     }
 
     // Check user
-    console.log(req.user.id, 'AA');
     if (cart.user.toString() !== req.user.id) {
       return res.status(401).json({ msg: 'User not authorized' });
     }

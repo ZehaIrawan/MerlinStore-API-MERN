@@ -34,7 +34,6 @@ router.post(
     }
 
     try {
-      // console.log(req.admin);
       await Admin.findById(req.admin.id).select('-password');
 
       const newProduct = new Product({
